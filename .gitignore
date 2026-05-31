@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.env.local
+
+# Generated log dataset (run `npm run generate-logs` in log-analyzer/server)
+log-analyzer/server/data/logs.json

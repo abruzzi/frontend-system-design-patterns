@@ -1,0 +1,11 @@
+{
+  "name": "log-analyzer",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n server,ui -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix ui\"",
+    "generate-logs": "npm run generate-logs --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
