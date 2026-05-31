@@ -83,11 +83,21 @@ export function analyzeLogs(
   };
 }
 
-export function simulateHeavyWork(iterations = 150_000): void {
+/** Blocks for at least this long — makes main-thread jank obvious in the demo. */
+export const DEMO_HEAVY_WORK_MIN_MS = 400;
+
+export function simulateHeavyWork(minMs = DEMO_HEAVY_WORK_MIN_MS): void {
+  const start = performance.now();
   let acc = 0;
-  for (let i = 0; i < iterations; i++) {
-    acc += Math.sqrt(i % 97);
+  let i = 0;
+
+  while (performance.now() - start < minMs) {
+    for (let j = 0; j < 80_000; j++) {
+      acc += Math.sqrt((i + j) % 97);
+    }
+    i += 80_000;
   }
+
   if (acc < 0) {
     console.log(acc);
   }

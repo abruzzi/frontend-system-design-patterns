@@ -2,19 +2,14 @@ import type { ProcessingMode } from "../types/log";
 
 const MODES: { id: ProcessingMode; label: string; description: string }[] = [
   {
-    id: "naive-main",
-    label: "Naive main thread",
-    description: "Filter on every keystroke — expect input lag",
-  },
-  {
-    id: "debounced-main",
-    label: "Debounced main thread",
-    description: "Typing feels smooth, but UI hitches after you stop",
+    id: "main",
+    label: "Main thread",
+    description: "Debounced search — typing stays smooth, but analysis blocks the UI",
   },
   {
     id: "worker",
-    label: "Debounced + Web Worker",
-    description: "Heavy work off the main thread — UI stays at 60fps",
+    label: "Web Worker",
+    description: "Same debounced search — analysis runs off the main thread",
   },
 ];
 
@@ -28,7 +23,7 @@ export function ProcessingModeToggle({
   onChange,
 }: ProcessingModeToggleProps) {
   return (
-    <div className="grid gap-2 sm:grid-cols-3">
+    <div className="grid gap-2 sm:grid-cols-2">
       {MODES.map((item) => {
         const active = item.id === mode;
         return (

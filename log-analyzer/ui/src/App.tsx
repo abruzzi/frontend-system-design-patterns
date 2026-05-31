@@ -12,14 +12,12 @@ import { useFps } from "./hooks/useFps";
 import type { ProcessingMode } from "./types/log";
 
 const MODE_LABELS: Record<ProcessingMode, string> = {
-  "naive-main": "Naive main thread",
-  "debounced-main": "Debounced main thread",
-  worker: "Debounced + Web Worker",
+  main: "Main thread",
+  worker: "Web Worker",
 };
 
 export default function App() {
-  const [mode, setMode] = useState<ProcessingMode>("worker");
-  const [showDemoPanel, setShowDemoPanel] = useState(false);
+  const [mode, setMode] = useState<ProcessingMode>("main");
   const fps = useFps();
 
   const {
@@ -45,13 +43,10 @@ export default function App() {
   const displayResult = result ?? placeholderResult();
 
   const demoTip = useMemo(() => {
-    if (mode === "naive-main") {
-      return "Type quickly in the search box — input should lag because filtering runs on every keystroke.";
+    if (mode === "main") {
+      return 'Main thread is active. Search "applyDiscount", then click a time-range pill — the spinner should freeze and min FPS should drop.';
     }
-    if (mode === "debounced-main") {
-      return 'Type a keyword, stop, then immediately click the level filter. The UI may hitch even though typing felt smooth.';
-    }
-    return "Repeat the same test — the spinner and filter controls should stay responsive while the worker processes.";
+    return "Web Worker is active. Repeat the same steps — the spinner should keep moving and min FPS should stay near 60.";
   }, [mode]);
 
   return (
@@ -72,6 +67,30 @@ export default function App() {
           onLevelChange={setLevel}
           onTimeRangeChange={setTimeRange}
         />
+
+        <div className="space-y-3 rounded-xl border border-sky-500/20 bg-sky-500/5 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-medium text-zinc-200">Where analysis runs</p>
+            <span
+              className={[
+                "rounded-full px-2.5 py-0.5 font-mono text-xs font-medium",
+                mode === "main"
+                  ? "bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30"
+                  : "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30",
+              ].join(" ")}
+            >
+              Active: {MODE_LABELS[mode]}
+            </span>
+          </div>
+          <ProcessingModeToggle mode={mode} onChange={setMode} />
+          <FpsIndicator
+            fps={fps}
+            isProcessing={isProcessing}
+            lastBlockDurationMs={lastBlockDurationMs}
+            modeLabel={MODE_LABELS[mode]}
+          />
+          <p className="text-sm text-zinc-400">{demoTip}</p>
+        </div>
 
         {loading && (
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-8 text-center text-sm text-zinc-400">
@@ -108,32 +127,6 @@ export default function App() {
             />
           </>
         )}
-
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30">
-          <button
-            type="button"
-            onClick={() => setShowDemoPanel((open) => !open)}
-            className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-zinc-400 hover:text-zinc-200"
-          >
-            <span className="font-medium">Processing mode demo</span>
-            <span className="font-mono text-xs">{showDemoPanel ? "▾" : "▸"}</span>
-          </button>
-
-          {showDemoPanel && (
-            <div className="space-y-4 border-t border-zinc-800 px-4 py-4">
-              <ProcessingModeToggle mode={mode} onChange={setMode} />
-              <FpsIndicator
-                fps={fps}
-                isProcessing={isProcessing}
-                lastBlockDurationMs={lastBlockDurationMs}
-                modeLabel={MODE_LABELS[mode]}
-              />
-              <p className="rounded-lg border border-zinc-800/80 bg-zinc-950/50 px-4 py-3 text-sm text-zinc-400">
-                <span className="font-medium text-zinc-300">Demo tip:</span> {demoTip}
-              </p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

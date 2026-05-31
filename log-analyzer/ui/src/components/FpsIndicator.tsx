@@ -1,5 +1,7 @@
+import type { FpsSample } from "../hooks/useFps";
+
 interface FpsIndicatorProps {
-  fps: number;
+  fps: FpsSample;
   isProcessing: boolean;
   lastBlockDurationMs: number | null;
   modeLabel: string;
@@ -11,8 +13,8 @@ export function FpsIndicator({
   lastBlockDurationMs,
   modeLabel,
 }: FpsIndicatorProps) {
-  const healthy = fps >= 55;
-  const degraded = fps >= 30 && fps < 55;
+  const healthy = fps.min >= 55;
+  const degraded = fps.min >= 30 && fps.min < 55;
 
   return (
     <div className="flex flex-wrap items-center gap-4 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3">
@@ -22,14 +24,17 @@ export function FpsIndicator({
           aria-hidden
         />
         <div>
-          <div className="text-xs uppercase tracking-wide text-zinc-500">FPS</div>
-          <div
-            className={[
-              "font-mono text-lg font-semibold",
-              healthy ? "text-emerald-400" : degraded ? "text-amber-400" : "text-rose-400",
-            ].join(" ")}
-          >
-            {fps}
+          <div className="text-xs uppercase tracking-wide text-zinc-500">FPS (min / avg)</div>
+          <div className="font-mono text-lg font-semibold text-zinc-100">
+            <span
+              className={[
+                healthy ? "text-emerald-400" : degraded ? "text-amber-400" : "text-rose-400",
+              ].join(" ")}
+            >
+              {fps.min}
+            </span>
+            <span className="text-zinc-600"> / </span>
+            <span className="text-zinc-400">{fps.avg}</span>
           </div>
         </div>
       </div>

@@ -47,11 +47,12 @@ Try searching `PriceCalculator`, `checkout-v2`, or filtering **ERROR** on `payme
 
 ## Demo modes
 
+Both modes debounce search input (300ms). The difference is where analysis runs:
+
 | Mode | Behavior |
 |------|----------|
-| **Naive main thread** | Filter on every keystroke — input and animations freeze |
-| **Debounced main thread** | Typing feels smooth, but UI hitches after you stop typing |
-| **Debounced + Web Worker** | Typing smooth *and* UI stays responsive while analysis runs |
+| **Main thread** | Typing stays smooth, but UI hitches while analysis runs |
+| **Web Worker** | Same debounced search — UI stays responsive during analysis |
 
 ## Architecture
 

@@ -58,7 +58,7 @@ export interface AnalysisResult {
   durationMs: number;
 }
 
-export type ProcessingMode = "naive-main" | "debounced-main" | "worker";
+export type ProcessingMode = "main" | "worker";
 
 export const PAGE_SIZE = 50;
 export const DEBOUNCE_MS = 300;

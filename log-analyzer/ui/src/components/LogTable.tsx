@@ -9,12 +9,51 @@ interface LogTableProps {
   onNextPage: () => void;
 }
 
-const LEVEL_STYLES: Record<LogEntry["level"], string> = {
-  ERROR: "text-rose-400 bg-rose-500/10 border-rose-500/20",
-  WARN: "text-amber-300 bg-amber-500/10 border-amber-500/20",
-  INFO: "text-sky-300 bg-sky-500/10 border-sky-500/20",
-  DEBUG: "text-zinc-400 bg-zinc-500/10 border-zinc-500/20",
+const LEVEL_STYLES: Record<
+  LogEntry["level"],
+  { badge: string; dot: string }
+> = {
+  ERROR: {
+    badge:
+      "bg-rose-950/90 text-rose-200 ring-1 ring-rose-500/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_14px_rgba(244,63,94,0.12)]",
+    dot: "bg-rose-400 shadow-[0_0_6px_rgba(251,113,133,0.55)]",
+  },
+  WARN: {
+    badge:
+      "bg-amber-950/80 text-amber-200 ring-1 ring-amber-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+    dot: "bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.45)]",
+  },
+  INFO: {
+    badge:
+      "bg-sky-950/70 text-sky-200 ring-1 ring-sky-500/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+    dot: "bg-sky-400 shadow-[0_0_5px_rgba(56,189,248,0.4)]",
+  },
+  DEBUG: {
+    badge:
+      "bg-zinc-900/90 text-zinc-400 ring-1 ring-zinc-600/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+    dot: "bg-zinc-500",
+  },
 };
+
+function LevelBadge({ level }: { level: LogEntry["level"] }) {
+  const style = LEVEL_STYLES[level];
+
+  return (
+    <span
+      className={[
+        "inline-flex w-[4.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full px-2 py-1",
+        "font-mono text-[10px] font-semibold uppercase tracking-[0.12em]",
+        style.badge,
+      ].join(" ")}
+    >
+      <span
+        className={["h-1.5 w-1.5 shrink-0 rounded-full", style.dot].join(" ")}
+        aria-hidden
+      />
+      {level}
+    </span>
+  );
+}
 
 export function LogTable({
   rows,
@@ -52,16 +91,9 @@ export function LogTable({
           rows.map((row) => (
             <div
               key={row.id}
-              className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[auto_1fr_auto]"
+              className="grid gap-3 px-4 py-3 text-sm md:grid-cols-[4.75rem_1fr_auto] md:items-start"
             >
-              <span
-                className={[
-                  "inline-flex w-fit rounded-md border px-2 py-0.5 font-mono text-xs",
-                  LEVEL_STYLES[row.level],
-                ].join(" ")}
-              >
-                {row.level}
-              </span>
+              <LevelBadge level={row.level} />
               <div>
                 <div className="font-mono text-zinc-200">{row.message}</div>
                 <div className="mt-1 text-xs text-zinc-500">

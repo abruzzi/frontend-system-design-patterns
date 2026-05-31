@@ -1,4 +1,4 @@
-import { analyzeLogs } from "../lib/analysis";
+import { analyzeLogs, simulateHeavyWork } from "../lib/analysis";
 import type { LogEntry, LogQuery } from "../types/log";
 
 type WorkerInbound =
@@ -24,7 +24,10 @@ self.onmessage = (event: MessageEvent<WorkerInbound>) => {
     }
 
     if (message.type === "QUERY") {
+      const start = performance.now();
       const result = analyzeLogs(sourceLogs, message.query, message.requestId);
+      simulateHeavyWork();
+      result.durationMs = performance.now() - start;
       const outbound: WorkerOutbound = { type: "RESULT", result };
       self.postMessage(outbound);
     }

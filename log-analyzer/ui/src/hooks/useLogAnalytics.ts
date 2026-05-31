@@ -61,15 +61,10 @@ export function useLogAnalytics({
   const workerRef = useRef<Worker | null>(null);
   const latestRequestIdRef = useRef(0);
 
-  const debouncedKeywordValue = useDebouncedValue(keyword, DEBOUNCE_MS);
-  const debouncedLevelValue = useDebouncedValue(level, DEBOUNCE_MS);
-  const debouncedPageValue = useDebouncedValue(page, DEBOUNCE_MS);
-  const debouncedTimeRangeValue = useDebouncedValue(timeRange, DEBOUNCE_MS);
-
-  const debouncedKeyword = mode === "naive-main" ? keyword : debouncedKeywordValue;
-  const debouncedLevel = mode === "naive-main" ? level : debouncedLevelValue;
-  const debouncedPage = mode === "naive-main" ? page : debouncedPageValue;
-  const debouncedTimeRange = mode === "naive-main" ? timeRange : debouncedTimeRangeValue;
+  const debouncedKeyword = useDebouncedValue(keyword, DEBOUNCE_MS);
+  const debouncedLevel = useDebouncedValue(level, DEBOUNCE_MS);
+  const debouncedPage = useDebouncedValue(page, DEBOUNCE_MS);
+  const debouncedTimeRange = useDebouncedValue(timeRange, DEBOUNCE_MS);
 
   const anchorMs = useMemo(() => datasetAnchorMs(logs), [logs]);
   const timeWindow = useMemo(
@@ -94,7 +89,7 @@ export function useLogAnalytics({
         requestId
       );
 
-      simulateHeavyWork(600_000);
+      simulateHeavyWork();
 
       const blockDuration = performance.now() - blockStart;
       setLastBlockDurationMs(blockDuration);
@@ -105,19 +100,10 @@ export function useLogAnalytics({
   );
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has("service")) params.set("service", "payment-service");
-    if (!params.has("env")) params.set("env", "prod");
-
-    const query = params.toString();
-    if (window.location.search !== `?${query}`) {
-      window.history.replaceState(null, "", `?${query}`);
-    }
-
     setLoading(true);
     setError(null);
 
-    fetch(`/api/logs?${query}`)
+    fetch("/api/logs")
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load logs (${res.status})`);
         return res.json() as Promise<LogsResponse>;
