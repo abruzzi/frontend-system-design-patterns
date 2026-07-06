@@ -1,0 +1,14 @@
+{
+  "name": "online-shopping",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "setup": "npm install --prefix server && npm install --prefix ui",
+    "dev": "concurrently -n server,ui -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix ui\"",
+    "build": "npm run build --prefix ui",
+    "typecheck": "npm run typecheck --prefix server && npm run typecheck --prefix ui"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
