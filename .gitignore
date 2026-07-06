@@ -7,3 +7,4 @@ dist/
 
 # Generated log dataset (run `npm run generate-logs` in log-analyzer/server)
 log-analyzer/server/data/logs.json
+.idea/

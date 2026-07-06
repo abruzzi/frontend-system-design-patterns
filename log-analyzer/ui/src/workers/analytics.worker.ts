@@ -1,5 +1,5 @@
-import { analyzeLogs, simulateHeavyWork } from "../lib/analysis";
-import type { LogEntry, LogQuery } from "../types/log";
+import { runWorkerDemoAnalysis } from "../lib/analysis";
+import type { AnalysisResult, LogEntry, LogQuery } from "../types/log";
 
 type WorkerInbound =
   | { type: "INGEST"; logs: LogEntry[] }
@@ -7,7 +7,7 @@ type WorkerInbound =
 
 type WorkerOutbound =
   | { type: "INGESTED"; total: number }
-  | { type: "RESULT"; result: ReturnType<typeof analyzeLogs> }
+  | { type: "RESULT"; result: AnalysisResult }
   | { type: "ERROR"; message: string };
 
 let sourceLogs: LogEntry[] = [];
@@ -24,10 +24,7 @@ self.onmessage = (event: MessageEvent<WorkerInbound>) => {
     }
 
     if (message.type === "QUERY") {
-      const start = performance.now();
-      const result = analyzeLogs(sourceLogs, message.query, message.requestId);
-      simulateHeavyWork();
-      result.durationMs = performance.now() - start;
+      const result = runWorkerDemoAnalysis(sourceLogs, message.query, message.requestId);
       const outbound: WorkerOutbound = { type: "RESULT", result };
       self.postMessage(outbound);
     }

@@ -3,16 +3,25 @@ import express from "express";
 import fs from "node:fs/promises";
 
 import { config } from "./config.js";
-import { generateLogs } from "../scripts/generate-logs.js";
+import { generateLogs } from "./logGenerator.js";
 import type { LogEntry, LogsResponse } from "./types.js";
 
 async function loadLogs(): Promise<LogEntry[]> {
   try {
     const raw = await fs.readFile(config.dataPath, "utf8");
     return JSON.parse(raw) as LogEntry[];
-  } catch {
+  } catch (error: unknown) {
+    if (
+      typeof error !== "object" ||
+      error === null ||
+      !("code" in error) ||
+      error.code !== "ENOENT"
+    ) {
+      throw error;
+    }
+
     process.stderr.write(
-      `logs.json not found — generating ${config.defaultLogCount.toLocaleString()} logs...\n`
+      `logs.json not found - generating ${config.defaultLogCount.toLocaleString()} logs...\n`
     );
     const logs = generateLogs(config.defaultLogCount);
     await fs.mkdir(new URL("../data/", import.meta.url), { recursive: true });
@@ -55,30 +64,36 @@ app.get("/health", (_req, res) => {
 });
 
 app.get("/api/logs", async (req, res) => {
-  if (!cachedLogs) {
-    cachedLogs = await loadLogs();
+  try {
+    if (!cachedLogs) {
+      cachedLogs = await loadLogs();
+    }
+
+    const service = typeof req.query.service === "string" ? req.query.service : null;
+    const env = typeof req.query.env === "string" ? req.query.env : null;
+    const from = typeof req.query.from === "string" ? req.query.from : null;
+    const to = typeof req.query.to === "string" ? req.query.to : null;
+
+    const filtered = filterLogs(cachedLogs, { service, env, from, to });
+
+    const response: LogsResponse = {
+      logs: filtered,
+      meta: {
+        total: filtered.length,
+        service,
+        env,
+        from,
+        to,
+        generatedAt: new Date().toISOString(),
+      },
+    };
+
+    res.json(response);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`GET /api/logs failed: ${message}\n`);
+    res.status(500).json({ error: "Failed to load logs" });
   }
-
-  const service = typeof req.query.service === "string" ? req.query.service : null;
-  const env = typeof req.query.env === "string" ? req.query.env : null;
-  const from = typeof req.query.from === "string" ? req.query.from : null;
-  const to = typeof req.query.to === "string" ? req.query.to : null;
-
-  const filtered = filterLogs(cachedLogs, { service, env, from, to });
-
-  const response: LogsResponse = {
-    logs: filtered,
-    meta: {
-      total: filtered.length,
-      service,
-      env,
-      from,
-      to,
-      generatedAt: new Date().toISOString(),
-    },
-  };
-
-  res.json(response);
 });
 
 app.listen(config.port, () => {

@@ -7,7 +7,8 @@ import { LogTable } from "./components/LogTable";
 import { ProcessingModeToggle } from "./components/ProcessingModeToggle";
 import { SearchBar } from "./components/SearchBar";
 import { TimelineChart } from "./components/TimelineChart";
-import { placeholderResult, useLogAnalytics } from "./hooks/useLogAnalytics";
+import { placeholderResult } from "./lib/analysis";
+import { useLogAnalytics } from "./hooks/useLogAnalytics";
 import { useFps } from "./hooks/useFps";
 import type { ProcessingMode } from "./types/log";
 
@@ -15,6 +16,21 @@ const MODE_LABELS: Record<ProcessingMode, string> = {
   main: "Main thread",
   worker: "Web Worker",
 };
+
+function DemoMetric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="text-xs uppercase tracking-wide text-zinc-500">{label}</div>
+      <div className="truncate font-mono text-sm font-semibold text-zinc-100">{value}</div>
+    </div>
+  );
+}
 
 export default function App() {
   const [mode, setMode] = useState<ProcessingMode>("main");
@@ -89,6 +105,22 @@ export default function App() {
             lastBlockDurationMs={lastBlockDurationMs}
             modeLabel={MODE_LABELS[mode]}
           />
+          <div className="grid gap-3 border-y border-zinc-800/80 py-3 sm:grid-cols-2 lg:grid-cols-4">
+            <DemoMetric label="Dataset" value={`${logs.length.toLocaleString()} logs`} />
+            <DemoMetric
+              label="Returned"
+              value={`${displayResult.filteredRows.length.toLocaleString()} rows`}
+            />
+            <DemoMetric
+              label="Analysis"
+              value={
+                lastBlockDurationMs !== null
+                  ? `${lastBlockDurationMs.toFixed(1)} ms`
+                  : "pending"
+              }
+            />
+            <DemoMetric label="Thread" value={MODE_LABELS[mode]} />
+          </div>
           <p className="text-sm text-zinc-400">{demoTip}</p>
         </div>
 

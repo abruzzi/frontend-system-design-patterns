@@ -12,7 +12,7 @@ export function useFps(): FpsSample {
   const frameCount = useRef(0);
   const lastSample = useRef(performance.now());
   const lastFrame = useRef(performance.now());
-  const minFrameMs = useRef(Infinity);
+  const maxFrameMs = useRef(0);
 
   useEffect(() => {
     let rafId = 0;
@@ -22,7 +22,7 @@ export function useFps(): FpsSample {
       lastFrame.current = now;
 
       if (frameMs > 0) {
-        minFrameMs.current = Math.min(minFrameMs.current, frameMs);
+        maxFrameMs.current = Math.max(maxFrameMs.current, frameMs);
       }
 
       frameCount.current += 1;
@@ -31,14 +31,14 @@ export function useFps(): FpsSample {
       if (elapsed >= 500) {
         const avg = Math.round((frameCount.current * 1000) / elapsed);
         const min =
-          minFrameMs.current === Infinity
+          maxFrameMs.current === 0
             ? avg
-            : Math.max(1, Math.round(1000 / minFrameMs.current));
+            : Math.max(1, Math.round(1000 / maxFrameMs.current));
 
         setFps({ avg, min });
         frameCount.current = 0;
         lastSample.current = now;
-        minFrameMs.current = Infinity;
+        maxFrameMs.current = 0;
       }
 
       rafId = requestAnimationFrame(tick);

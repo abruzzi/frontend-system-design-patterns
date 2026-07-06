@@ -98,13 +98,52 @@ export function simulateHeavyWork(minMs = DEMO_HEAVY_WORK_MIN_MS): void {
     i += 80_000;
   }
 
-  if (acc < 0) {
-    console.log(acc);
+  if (Number.isNaN(acc)) {
+    throw new Error("Unexpected demo work result");
   }
 }
 
 export function emptyAggregations(): LogAggregations {
   return emptyByLevel();
+}
+
+function runDemoAnalysis(
+  logs: LogEntry[],
+  query: LogQuery,
+  requestId: number
+): AnalysisResult {
+  const blockStart = performance.now();
+  const analysis = analyzeLogs(logs, query, requestId);
+  simulateHeavyWork();
+  analysis.durationMs = performance.now() - blockStart;
+  return analysis;
+}
+
+export function runMainThreadDemoAnalysis(
+  logs: LogEntry[],
+  query: LogQuery,
+  requestId: number
+): AnalysisResult {
+  return runDemoAnalysis(logs, query, requestId);
+}
+
+export function runWorkerDemoAnalysis(
+  logs: LogEntry[],
+  query: LogQuery,
+  requestId: number
+): AnalysisResult {
+  return runDemoAnalysis(logs, query, requestId);
+}
+
+export function placeholderResult(): AnalysisResult {
+  return {
+    requestId: 0,
+    filteredRows: [],
+    totalMatches: 0,
+    aggregations: emptyAggregations(),
+    timeline: [],
+    durationMs: 0,
+  };
 }
 
 export function levelLabel(level: LevelFilter): string {

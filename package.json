@@ -7,6 +7,7 @@
     "setup:log-analyzer": "npm install --prefix log-analyzer/server && npm install --prefix log-analyzer/ui && npm run generate-logs --prefix log-analyzer/server",
     "dev:log-analyzer": "concurrently -n server,ui -c blue,green \"npm run dev --prefix log-analyzer/server\" \"npm run dev --prefix log-analyzer/ui\"",
     "build:log-analyzer": "npm run build --prefix log-analyzer/ui",
+    "test:log-analyzer": "npm run test --prefix log-analyzer/ui",
     "typecheck:log-analyzer": "npm run typecheck --prefix log-analyzer/server && npm run typecheck --prefix log-analyzer/ui"
   },
   "devDependencies": {

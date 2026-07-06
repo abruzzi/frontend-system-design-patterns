@@ -7,6 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "generate-logs": "node --experimental-strip-types scripts/generate-logs.ts",
+    "export-raw-logs": "node --experimental-strip-types scripts/export-raw-logs.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
