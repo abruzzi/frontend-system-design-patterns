@@ -12,6 +12,7 @@ Each folder is a self-contained pattern demo — Vite + Tailwind CSS, mostly Rea
 | Performance API + profilers | [`performance-profiler/`](./performance-profiler/) | `performance.now` / `mark` / `measure`, Chrome flamechart, React Profiler |
 | Media Source Extensions | [`media-source/`](./media-source/) | Native `<video src>` vs `MediaSource` + `SourceBuffer`, then adaptive bitrate from bandwidth + buffer |
 | High-performance whiteboard | [`whiteboard/`](./whiteboard/) | Canvas scene model, hit testing, spatial index, viewport culling, frame-aligned rendering |
+| Streaming AI UI (NDJSON) | [`streaming-ui/`](./streaming-ui/) | HTTP streaming + NDJSON: server chunks, client buffer/parse, incremental markdown render |
 
 ## Quick start
 
@@ -49,6 +50,14 @@ npm run dev:whiteboard
 ```
 
 Open [http://localhost:5177](http://localhost:5177). Draw or seed 10 → 10,000 shapes, then toggle culling / spatial index / rAF while watching FPS.
+
+```bash
+# Streaming AI UI — NDJSON HTTP stream (API + UI)
+npm run setup:streaming-ui
+npm run dev:streaming-ui
+```
+
+Open the Vite URL printed in the terminal, click **Start streaming**. Deep dive: [`streaming-ui/docs/streaming-guide.md`](./streaming-ui/docs/streaming-guide.md).
 
 ## Tech stack
 

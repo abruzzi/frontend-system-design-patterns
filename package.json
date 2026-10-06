@@ -19,7 +19,10 @@
     "setup:whiteboard": "npm install --prefix whiteboard/ui",
     "dev:whiteboard": "npm run dev --prefix whiteboard/ui",
     "build:whiteboard": "npm run build --prefix whiteboard/ui",
-    "typecheck:whiteboard": "npm run typecheck --prefix whiteboard/ui"
+    "typecheck:whiteboard": "npm run typecheck --prefix whiteboard/ui",
+    "setup:streaming-ui": "npm install --prefix streaming-ui/server && npm install --prefix streaming-ui/ui",
+    "dev:streaming-ui": "concurrently -n server,ui -c blue,green \"npm run dev --prefix streaming-ui/server\" \"npm run dev --prefix streaming-ui/ui\"",
+    "build:streaming-ui": "npm run build --prefix streaming-ui/ui"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
