@@ -1,0 +1,9 @@
+{
+  "name": "performance-profiler",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix ui",
+    "build": "npm run build --prefix ui",
+    "typecheck": "npm run typecheck --prefix ui"
+  }
+}

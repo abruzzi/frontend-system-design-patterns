@@ -8,7 +8,18 @@
     "dev:log-analyzer": "concurrently -n server,ui -c blue,green \"npm run dev --prefix log-analyzer/server\" \"npm run dev --prefix log-analyzer/ui\"",
     "build:log-analyzer": "npm run build --prefix log-analyzer/ui",
     "test:log-analyzer": "npm run test --prefix log-analyzer/ui",
-    "typecheck:log-analyzer": "npm run typecheck --prefix log-analyzer/server && npm run typecheck --prefix log-analyzer/ui"
+    "typecheck:log-analyzer": "npm run typecheck --prefix log-analyzer/server && npm run typecheck --prefix log-analyzer/ui",
+    "setup:performance-profiler": "npm install --prefix performance-profiler/ui",
+    "dev:performance-profiler": "npm run dev --prefix performance-profiler/ui",
+    "build:performance-profiler": "npm run build --prefix performance-profiler/ui",
+    "typecheck:performance-profiler": "npm run typecheck --prefix performance-profiler/ui",
+    "setup:media-source": "npm install --prefix media-source/ui",
+    "dev:media-source": "npm run dev --prefix media-source/ui",
+    "build:media-source": "npm run build --prefix media-source/ui",
+    "setup:whiteboard": "npm install --prefix whiteboard/ui",
+    "dev:whiteboard": "npm run dev --prefix whiteboard/ui",
+    "build:whiteboard": "npm run build --prefix whiteboard/ui",
+    "typecheck:whiteboard": "npm run typecheck --prefix whiteboard/ui"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

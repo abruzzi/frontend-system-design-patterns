@@ -1,0 +1,12 @@
+<!-- Example 1 — SVG keeps shapes as DOM elements.
+     Idea: a rectangle is not a drawing command. It is a node the browser
+     retains, the same way it retains a div. -->
+
+<svg width="400" height="240">
+  <rect id="box" x="40" y="40" width="120" height="80" fill="#38bdf8" />
+  <circle cx="240" cy="80" r="40" fill="#818cf8" />
+  <line x1="40" y1="180" x2="360" y2="180" stroke="#fafafa" stroke-width="4" />
+  <path d="M 300 160 L 360 200 L 300 200 Z" fill="#34d399" />
+</svg>
+
+<!-- rect, circle, line, path — still elements, still inspectable in DevTools. -->

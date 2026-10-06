@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Source — Frontend System Design Patterns</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen bg-zinc-950">
+    <div class="border-b border-zinc-800 bg-zinc-900/80">
+      <div class="mx-auto max-w-3xl space-y-2 px-4 py-5 md:px-6">
+        <p class="text-xs font-medium uppercase tracking-[0.2em] text-sky-400/80">
+          Frontend System Design Patterns
+        </p>
+        <h1 class="font-display text-2xl font-semibold tracking-tight text-zinc-50 md:text-3xl">
+          Media Source
+        </h1>
+        <p class="max-w-2xl text-sm leading-relaxed text-zinc-400">
+          Native
+          <code class="font-mono text-zinc-300">&lt;video src&gt;</code>
+          vs
+          <code class="font-mono text-zinc-300">MediaSource</code>
+          +
+          <code class="font-mono text-zinc-300">SourceBuffer</code>,
+          then adaptive bitrate: observe network and buffer, then choose the next quality.
+        </p>
+      </div>
+    </div>
+
+    <div class="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-5 md:px-6">
+      <div class="flex flex-wrap rounded-xl border border-zinc-800 bg-zinc-900/60 p-1">
+        <button
+          type="button"
+          data-mode="native"
+          aria-pressed="true"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium bg-sky-500/15 text-sky-300"
+        >
+          Native Video
+        </button>
+        <button
+          type="button"
+          data-mode="basic"
+          aria-pressed="false"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 transition hover:text-zinc-200"
+        >
+          Basic MSE
+        </button>
+        <button
+          type="button"
+          data-mode="streaming"
+          aria-pressed="false"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 transition hover:text-zinc-200"
+        >
+          Streaming Demo
+        </button>
+        <button
+          type="button"
+          data-mode="abr"
+          aria-pressed="false"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 transition hover:text-zinc-200"
+        >
+          Adaptive
+        </button>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-700/80 bg-zinc-900 shadow-lg shadow-black/20">
+        <video
+          id="player"
+          class="aspect-video w-full bg-black"
+          controls
+          playsinline
+        ></video>
+        <div class="flex items-center justify-between gap-3 border-t border-zinc-800 px-4 py-3">
+          <p id="playback-status" class="text-sm text-zinc-400">idle</p>
+          <p class="font-mono text-xs text-zinc-500">
+            video → blob URL → MediaSource → SourceBuffer
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-3 rounded-xl border border-sky-500/20 bg-sky-500/5 p-4">
+        <p class="text-sm font-medium text-zinc-200">Playback</p>
+        <dl class="grid gap-3 border-y border-zinc-800/80 py-3 sm:grid-cols-2">
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Mode</dt>
+            <dd id="metric-mode" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              Native video
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Video src</dt>
+            <dd
+              id="metric-src"
+              class="truncate font-mono text-sm font-semibold text-zinc-100"
+              title=""
+            >
+              —
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Current time</dt>
+            <dd id="metric-time" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              —
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Buffered</dt>
+            <dd id="metric-buffered" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              —
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Buffer ahead</dt>
+            <dd id="metric-ahead" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              —
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">SourceBuffer updating</dt>
+            <dd id="metric-updating" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              —
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Estimated bandwidth</dt>
+            <dd id="metric-bandwidth" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              —
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-xs uppercase tracking-wide text-zinc-500">Selected quality</dt>
+            <dd id="metric-quality" class="truncate font-mono text-sm font-semibold text-zinc-100">
+              —
+            </dd>
+          </div>
+        </dl>
+        <div>
+          <div class="mb-1.5 flex justify-between text-xs text-zinc-500">
+            <span>video.buffered</span>
+            <span>currentTime ▲</span>
+          </div>
+          <div class="relative h-2 overflow-hidden rounded-full bg-zinc-800">
+            <div id="buffer-fill" class="absolute inset-y-0 left-0 w-0 bg-sky-400/80"></div>
+            <div
+              id="playhead"
+              class="absolute top-0 h-full w-0.5 bg-zinc-50"
+              style="left: 0%"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-sm font-medium text-zinc-200">Segments</h2>
+          <div id="streaming-controls" class="hidden items-center gap-3">
+            <label class="flex items-center gap-2 text-xs text-zinc-400">
+              <input
+                id="auto-load"
+                type="checkbox"
+                class="rounded border-zinc-600 bg-zinc-900 text-sky-500"
+              />
+              Auto-load if ahead &lt; 6s
+            </label>
+            <button
+              id="load-next"
+              type="button"
+              class="rounded-lg px-3 py-1.5 text-sm font-medium text-emerald-300 transition hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:text-zinc-600"
+            >
+              Load Next Segment
+            </button>
+          </div>
+          <div id="abr-controls" class="hidden items-center gap-2">
+            <span class="text-xs text-zinc-500">Network</span>
+            <button
+              type="button"
+              data-network="fast"
+              aria-pressed="true"
+              class="rounded-lg px-2.5 py-1 text-xs font-medium bg-amber-500/15 text-amber-300"
+            >
+              Fast
+            </button>
+            <button
+              type="button"
+              data-network="medium"
+              aria-pressed="false"
+              class="rounded-lg px-2.5 py-1 text-xs font-medium text-zinc-400 transition hover:text-zinc-200"
+            >
+              Medium
+            </button>
+            <button
+              type="button"
+              data-network="slow"
+              aria-pressed="false"
+              class="rounded-lg px-2.5 py-1 text-xs font-medium text-zinc-400 transition hover:text-zinc-200"
+            >
+              Slow
+            </button>
+          </div>
+        </div>
+        <p class="mb-3 text-xs leading-relaxed text-zinc-500">
+          Part 1 loads one quality. Adaptive mode measures download speed and buffer
+          ahead, then calls <code class="font-mono text-zinc-400">loadSegment(index, quality)</code>.
+        </p>
+        <ul id="segment-list" class="max-h-56 overflow-auto rounded-lg border border-zinc-800 px-3 py-1"></ul>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

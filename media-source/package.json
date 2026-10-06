@@ -1,0 +1,10 @@
+{
+  "name": "media-source",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix ui",
+    "build": "npm run build --prefix ui",
+    "segment-video": "bash scripts/segment-video.sh",
+    "segment-qualities": "bash scripts/segment-qualities.sh"
+  }
+}

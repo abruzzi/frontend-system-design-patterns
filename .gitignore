@@ -8,3 +8,26 @@ dist/
 # Generated log dataset (run `npm run generate-logs` in log-analyzer/server)
 log-analyzer/server/data/logs.json
 .idea/
+
+# YouTube production materials — stay on this machine, not on the remote.
+# Spoken scripts, teleprompters, outlines, reveal decks, and Remotion projects.
+log-analyzer/EDUCATION.md
+log-analyzer/WORKER_VIDEO_SCRIPT.md
+
+performance-profiler/script.md
+
+media-source/script.md
+media-source/scrpit-p2.md
+media-source/teleprompter.md
+media-source/teleprompter-p2.md
+media-source/frontend-system-design-part1-mse-demo-scope.md
+media-source/slides/
+media-source/package-lock.json
+
+whiteboard/drawing-app-p1.md
+whiteboard/drawing-app-p2.md
+whiteboard/drawing-app-p3.md
+whiteboard/outline.md
+whiteboard/slides/
+whiteboard/quadtree-slides/
+whiteboard/package-lock.json

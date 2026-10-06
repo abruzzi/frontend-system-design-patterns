@@ -1,0 +1,11 @@
+{
+  "name": "whiteboard",
+  "private": true,
+  "scripts": {
+    "setup": "npm install --prefix ui",
+    "setup:whiteboard": "npm run setup",
+    "dev": "npm run dev --prefix ui",
+    "build": "npm run build --prefix ui",
+    "typecheck": "npm run typecheck --prefix ui"
+  }
+}
